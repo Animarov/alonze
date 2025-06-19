@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кликер - Зарабатывай монеты!</title>
+    <title>Монетный кликер</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
+            background-color: #f5f5f5;
         }
         .balance {
             font-size: 24px;
@@ -31,6 +34,18 @@
             margin-top: 20px;
             font-size: 18px;
         }
+        .plus-one {
+            position: absolute;
+            color: gold;
+            font-weight: bold;
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 1s forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
     </style>
 </head>
 <body>
@@ -39,68 +54,90 @@
     <div class="counter">Кликов: <span id="counter">0</span></div>
 
     <script>
-        // Элементы
+        // Инициализация переменных
+        let coins = 0;
+        let clicks = 0;
+        
+        // Получаем элементы DOM
         const coin = document.getElementById('coin');
         const balanceElement = document.getElementById('balance');
         const counterElement = document.getElementById('counter');
-
-        // Загружаем данные из localStorage
-        let coins = parseInt(localStorage.getItem('coins')) || 0;
-        let clicks = parseInt(localStorage.getItem('clicks')) || 0;
-
-        // Обновляем отображение
-        function updateDisplay() {
-            balanceElement.textContent = Баланс: ${coins} ${formatCoins(coins)};
-            counterElement.textContent = clicks;
-        }
-
-        // Форматирование слова "монета"
-        function formatCoins(num) {
-            let n = num % 100;
-            if (n >= 5 && n <= 20) return 'монет';
+        
+        // Загружаем сохранённые данные из localStorage
+        function loadData() {
+            const savedCoins = localStorage.getItem('coins');
+            const savedClicks = localStorage.getItem('clicks');
             
-            n = num % 10;
-            if (n === 1) return 'монета';
-            if (n >= 2 && n <= 4) return 'монеты';
-            return 'монет';
+            if (savedCoins) coins = parseInt(savedCoins);
+            if (savedClicks) clicks = parseInt(savedClicks);
+            
+            updateDisplay();
         }
-
-        // Обработчик клика
-        coin.addEventListener('click', function() {
-            coins++;
-            clicks++;
+        
+        // Сохраняем данные в localStorage
+        function saveData() {
             localStorage.setItem('coins', coins);
             localStorage.setItem('clicks', clicks);
+        }
+        
+        // Обновляем отображение
+        function updateDisplay() {
+            balanceElement.textContent = Баланс: ${coins} ${getCoinWord(coins)};
+            counterElement.textContent = clicks;
+        }
+        
+        // Правильное склонение слова "монета"
+        function getCoinWord(num) {
+            if (num % 100 >= 11 && num % 100 <= 19) return 'монет';
+            
+            switch(num % 10) {
+                case 1: return 'монета';
+                case 2:
+                case 3:
+                case 4: return 'монеты';
+                default: return 'монет';
+            }
+        }
+        
+        // Создаём анимацию "+1"
+        function createPlusOne(x, y) {
+            const plusOne = document.createElement('div');
+            plusOne.className = 'plus-one';
+            plusOne.textContent = '+1';
+            plusOne.style.left = ${x}px;
+            plusOne.style.top = ${y}px;
+            document.body.appendChild(plusOne);
+            
+            // Удаляем элемент после анимации
+            setTimeout(() => {
+                plusOne.remove();
+            }, 1000);
+        }
+        
+        // Обработчик клика по монете
+        coin.addEventListener('click', function(e) {
+            // Увеличиваем счётчики
+            coins++;
+            clicks++;
+            
+            // Сохраняем данные
+            saveData();
+            
+            // Обновляем отображение
             updateDisplay();
             
-            // Анимация
+            // Анимация нажатия
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'scale(1)';
             }, 100);
             
             // Создаём эффект "+1"
-            const plusOne = document.createElement('div');
-            plusOne.textContent = '+1';
-            plusOne.style.position = 'absolute';
-            plusOne.style.color = 'gold';
-            plusOne.style.fontWeight = 'bold';
-            plusOne.style.fontSize = '20px';
-            plusOne.style.left = ${event.clientX}px;
-            plusOne.style.top = ${event.clientY - 30}px;
-            plusOne.style.pointerEvents = 'none';
-            document.body.appendChild(plusOne);
-            
-            setTimeout(() => {
-                plusOne.style.transition = 'all 0.5s';
-                plusOne.style.opacity = '0';
-                plusOne.style.top = ${event.clientY - 80}px;
-                setTimeout(() => plusOne.remove(), 500);
-            }, 10);
+            createPlusOne(e.clientX, e.clientY);
         });
-
-        // Инициализация
-        updateDisplay();
+        
+        // Загружаем данные при старте
+        loadData();
     </script>
 </body>
 </html>
