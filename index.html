@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер - Зарабатывай монеты!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .balance {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .coin {
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+        }
+        .coin:active {
+            transform: scale(0.95);
+        }
+        .counter {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="balance" id="balance">Баланс: 0 монет</div>
+    <img src="https://cdn-icons-png.flaticon.com/512/3523/3523785.png" alt="Монета" class="coin" id="coin">
+    <div class="counter">Кликов: <span id="counter">0</span></div>
+
+    <script>
+        // Элементы
+        const coin = document.getElementById('coin');
+        const balanceElement = document.getElementById('balance');
+        const counterElement = document.getElementById('counter');
+
+        // Загружаем данные из localStorage
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let clicks = parseInt(localStorage.getItem('clicks')) || 0;
+
+        // Обновляем отображение
+        function updateDisplay() {
+            balanceElement.textContent = Баланс: ${coins} ${formatCoins(coins)};
+            counterElement.textContent = clicks;
+        }
+
+        // Форматирование слова "монета"
+        function formatCoins(num) {
+            let n = num % 100;
+            if (n >= 5 && n <= 20) return 'монет';
+            
+            n = num % 10;
+            if (n === 1) return 'монета';
+            if (n >= 2 && n <= 4) return 'монеты';
+            return 'монет';
+        }
+
+        // Обработчик клика
+        coin.addEventListener('click', function() {
+            coins++;
+            clicks++;
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('clicks', clicks);
+            updateDisplay();
+            
+            // Анимация
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Создаём эффект "+1"
+            const plusOne = document.createElement('div');
+            plusOne.textContent = '+1';
+            plusOne.style.position = 'absolute';
+            plusOne.style.color = 'gold';
+            plusOne.style.fontWeight = 'bold';
+            plusOne.style.fontSize = '20px';
+            plusOne.style.left = ${event.clientX}px;
+            plusOne.style.top = ${event.clientY - 30}px;
+            plusOne.style.pointerEvents = 'none';
+            document.body.appendChild(plusOne);
+            
+            setTimeout(() => {
+                plusOne.style.transition = 'all 0.5s';
+                plusOne.style.opacity = '0';
+                plusOne.style.top = ${event.clientY - 80}px;
+                setTimeout(() => plusOne.remove(), 500);
+            }, 10);
+        });
+
+        // Инициализация
+        updateDisplay();
+    </script>
+</body>
+</html>
