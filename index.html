@@ -3,13 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Clicker</title>
-    <script>
-        // Перенаправление на Google Apps Script веб-приложение
-        window.location.replace('https://script.google.com/macros/s/AKfycbxybcX58k9kEt1zsxrdl2TcsUO5RGwgIwiqh5mWMvE_r_13H1NGkUEQuC52B4_0xMPBGQ/exec');
-    </script>
+    <title>Анимация текста</title>
+    <style>
+        #text {
+            font-size: 24px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .visible {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <p>Перенаправление на Coin Clicker...</p>
+
+<div id="text">Я сегодня в гараж</div>
+
+<script>
+    const textElement = document.getElementById('text');
+
+    function showText() {
+        textElement.classList.add('visible');
+        setTimeout(() => {
+            textElement.classList.remove('visible');
+        }, 2000); // Текст будет виден 2 секунды
+    }
+
+    setInterval(showText, 4000); // Показать текст каждые 4 секунды
+</script>
+
 </body>
 </html>
